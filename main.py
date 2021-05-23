@@ -10,14 +10,14 @@ labels = {}
 
 linecount = 0
 for line in f:  # labelları mape ekledim
-    linecount = linecount + 1
-    for word in line.split(" "):
-        islabel = re.search(':', word)
-        if islabel:
-            pos = word.find(':')
-            val = 3 * (linecount - 1)
-            labels[word[:pos]] = hex(val)[2:]
-            linecount = linecount - 1
+    islabel = re.search(':', line)
+    if islabel:
+        pos = line.find(':')
+        val = 3 * (linecount)
+        labels[line[:pos]] = hex(val)[2:]
+    else:
+        linecount=linecount+1
+
 f.close()
 f = open('file', 'r')
 
@@ -74,7 +74,7 @@ for lines in f:
         addrmode = "0"
         operand = "0"
 
-    print(opcode, addrmode, operand)
+   # print(opcode, addrmode, operand)
 
     if opcode == "-1":
         continue
