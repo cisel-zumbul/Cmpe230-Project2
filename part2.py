@@ -26,6 +26,8 @@ memory[53]='00'
 memory[54]='45'
 
 
+
+
 def getdatafrommemo(address):
     toint = int(address, 10)
     val1 = memory[toint]
@@ -33,9 +35,12 @@ def getdatafrommemo(address):
     data = val1 + val2
     return data
 
+
+
 SF=False
 ZF=False
 CF=False
+
 
 
 for word in f:
@@ -49,7 +54,7 @@ for word in f:
     o3=hex(o2)
     opcode=o3[2:]
     addr= tobinary[-2:]        #son iki digit
-    print(opcode,addr,operand)
+    #print(opcode,addr,operand)
 
     if(opcode=='1'):  #Halt
         print("Halts the cpu")
@@ -68,11 +73,24 @@ for word in f:
             val=register[operand]
             register['0001']=getdatafrommemo(val)
 
-        if(addr=='11'):
+        if(addr=='11'): #LOAD [1234]
             register['0001']=getdatafrommemo(operand)
 
-    print(register.items())
+    elif(opcode=='3'):  #Store
 
-
-
-
+        if(addr=='01'): #STORE C
+            val=register['0001']
+            register[operand]=val
+        if(addr=='10'):  #STORE [C]
+            val=register['0001']
+            adr=register[operand]
+            toint=int(adr,16)
+            memory[toint]=val[:2]
+            memory[toint+1]=val[-2:]
+        if(addr=='11'):  #STORE [1234]
+            val=register['0001']
+            toint=int(operand,16)
+            memory[toint] = val[:2]
+            memory[toint + 1] = val[-2:]
+              
+              
