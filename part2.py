@@ -156,14 +156,14 @@ for word in f:
 
     elif (opcode=='9'): #AND
         val = register['0001']
-        if (addr == '00'):  # XOR 0004
+        if (addr == '00'):  # AND 0004
             opr = operand
-        elif (addr == '01'):  # X0R C
+        elif (addr == '01'):  # AND C
             opr = register[operand]
-        elif (addr == '10'):  # XOR [C]
+        elif (addr == '10'):  # AND [C]
             a = register[operand]
             opr = getdatafrommemo(a)
-        elif (addr == '11'):  # XOR [1234]
+        elif (addr == '11'):  # AND [1234]
             opr = getdatafrommemo(operand)
         tobin = "{0:06b}".format(int(val, 16)).zfill(16)  # binarye çevirdim 16 digitlik
         oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
@@ -181,14 +181,14 @@ for word in f:
 
     elif (opcode == 'a'):  # OR
         val = register['0001']
-        if (addr == '00'):  # XOR 0004
+        if (addr == '00'):  # OR 0004
             opr = operand
-        elif (addr == '01'):  # X0R C
+        elif (addr == '01'):  # 0R C
             opr = register[operand]
-        elif (addr == '10'):  # XOR [C]
+        elif (addr == '10'):  # OR [C]
             a = register[operand]
             opr = getdatafrommemo(a)
-        elif (addr == '11'):  # XOR [1234]
+        elif (addr == '11'):  # OR [1234]
             opr = getdatafrommemo(operand)
         tobin = "{0:06b}".format(int(val, 16)).zfill(16)  # binarye çevirdim 16 digitlik
         oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
@@ -204,14 +204,14 @@ for word in f:
         register["0001"] = hex(int(res, 2))[2:].zfill(4)
 
     elif (opcode == 'b'):  # NOT
-        if (addr == '00'):  # XOR 0004
+        if (addr == '00'):  # NOT 0004
             opr = operand
-        elif (addr == '01'):  # X0R C
+        elif (addr == '01'):  # NOT C
             opr = register[operand]
-        elif (addr == '10'):  # XOR [C]
+        elif (addr == '10'):  # NOT [C]
             a = register[operand]
             opr = getdatafrommemo(a)
-        elif (addr == '11'):  # XOR [1234]
+        elif (addr == '11'):  # NOT [1234]
             opr = getdatafrommemo(operand)
         oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
         res = noting(oprtobin)
