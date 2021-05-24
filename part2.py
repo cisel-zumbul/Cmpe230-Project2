@@ -51,13 +51,13 @@ def sum(operand1, operand2):
         ZF = True
         return format(sum, '4x')
     if len(formed) > 16:
-        if formed[15] == '1':
+        if formed[1] == '1':
             SF = True
         CF = True
         int_result = sum - pow(2,16)
         final = '{0:04x}'.format(int_result)
         return final
-    if len(formed) == 16 and formed[15] == '1':
+    if len(formed) == 16 and formed[0] == '1':
         SF = True
     final=format(sum, '4x')
     print(final)
