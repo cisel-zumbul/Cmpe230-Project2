@@ -35,6 +35,43 @@ def getdatafrommemo(address):
     data = val1 + val2
     return data
 
+def sum(operand1, operand2):
+    global CF, SF, ZF
+    int1 = int(operand1, 16)
+    int2 = int(operand2, 16)
+    sum = int1 + int2
+    print(sum)
+    formed = bin(sum)[2:]
+    if sum == 0 :
+        ZF = True
+        return format(sum, '4x')
+    if len(formed) > 16:
+        if formed[15] == '1':
+            SF = True
+        CF = True
+        int_result = sum - pow(2,16)
+        final = '{0:04x}'.format(int_result)
+        return final
+    if len(formed) == 16 and formed[15] == '1':
+        SF = True
+    final=format(sum, '4x')
+    print(final)
+    return final
+
+def postoneg(operand):
+    int1 = int(operand, 16)
+    new=''
+    bin_num = "{0:016b}".format(int1)
+    for c in bin_num:
+        if c == '0':
+            new = new+'1'
+        if c == '1':
+            new = new+'0'
+    a = int(new,2)
+    a= a+1
+    final = '{:x}'.format(a)
+    return final
+
 def xor(bin1,bin2):
     res=""
     for i in range(16):
@@ -129,6 +166,93 @@ for word in f:
             memory[toint] = val[:2]
             memory[toint + 1] = val[-2:]
 
+        elif opcode=='4': #Add
+
+        if addr =='00': #ADD 0D05
+            val=sum(register['0001'], operand)
+
+        if addr=='01': #ADD C
+            op2 = register[operand]
+            val = sum(register['0001'], op2)
+
+        if addr=='10': #ADD [B]
+            ad=register[operand]
+            data = memory[ad] + memory[ad+1]
+            val=sum(register['0001'],data)
+
+        if addr=='11': #ADD [2542]
+            ad = operand
+            data = memory[ad] + memory[ad+1]
+            val = sum(register['0001'], data)
+        register['0001'] = val
+
+    elif opcode=='5': #Sub
+       
+        if addr =='00': #SUB 0D05
+            val=sum(register['0001'], postoneg(operand))
+
+        if addr=='01': #SUB C
+            op2 = register[operand]
+            val = sum(register['0001'], postoneg(op2))
+
+        if addr=='10': #SUB [B]
+            ad=register[operand]
+            data = memory[ad] + memory[ad+1]
+            val=sum(register['0001'],postoneg(data))
+
+        if addr=='11': #SUB [2542]
+            ad = operand
+            data = memory[ad] + memory[ad+1]
+            val = sum(register['0001'], postoneg(data))
+        register['0001'] = val
+
+    elif opcode=='6' : #Inc
+
+        if addr =='00': #INC 0D05
+            val=sum(operand, '0001')
+
+        if addr=='01': #INC C
+            op2 = register[operand]
+            val = sum(op2, '0001')
+            register[operand] = val
+
+        if addr=='10': #INC [B]
+            ad=register[operand]
+            data = memory[ad] + memory[ad+1]
+            val=sum(data, '0001')
+            memory[ad] = val[:2]
+            memory[ad+ 1] = val[-2:]
+
+        if addr=='11': #INC [2542]
+            ad = operand
+            data = memory[ad] + memory[ad+1]
+            val = sum(data, '0001')
+            memory[ad] = val[:2]
+            memory[ad + 1] = val[-2:]
+
+    elif opcode == '7': #Dec
+       
+        if addr == '00':  #DEC 0D05
+            val = sum(operand, 'ffff') #'ffff' = -1 (2's complement as hex)
+
+        if addr == '01':  #DEC C
+            op2 = register[operand]
+            val = sum(op2, 'ffff')
+            register[operand] = val
+
+        if addr == '10':  #DEC [B]
+            ad = register[operand]
+            data = memory[ad] + memory[ad + 1]
+            val = sum(data, 'ffff')
+            memory[ad] = val[:2]
+            memory[ad + 1] = val[-2:]
+
+        if addr == '11':  #DEC [2542]
+            ad = operand
+            data = memory[ad] + memory[ad + 1]
+            val = sum(data, 'ffff')
+            memory[ad] = val[:2]
+            memory[ad + 1] = val[-2:]
 
     elif(opcode=='8'): #XOR
         val=register['0001']
