@@ -35,11 +35,47 @@ def getdatafrommemo(address):
     data = val1 + val2
     return data
 
+def xor(bin1,bin2):
+    res=""
+    for i in range(16):
+        if bin1[i]==bin2[i]:
+            res+="0"
+        else:
+            res+="1"
+    return res
+
+def anding(bin1,bin2):
+    res = ""
+    for i in range(16):
+        if bin1[i] == "1" and bin2[i]=="1":
+            res += "1"
+        else:
+            res += "0"
+    return res
+
+def oring(bin1,bin2):
+    res = ""
+    for i in range(16):
+        if bin1[i] == "0" and bin2[i]=="0":
+            res += "0"
+        else:
+            res += "1"
+    return res
+
+def noting(bin):
+    res=""
+    for i in range(16):
+        if bin[i]=="0":
+            res+="1"
+        elif bin[i]=="1":
+            res+="0"
+    return res
 
 
 SF=False
 ZF=False
 CF=False
+
 
 
 
@@ -83,8 +119,8 @@ for word in f:
             register[operand]=val
         if(addr=='10'):  #STORE [C]
             val=register['0001']
-            adr=register[operand]
-            toint=int(adr,16)
+            a=register[operand]
+            toint=int(a,16)
             memory[toint]=val[:2]
             memory[toint+1]=val[-2:]
         if(addr=='11'):  #STORE [1234]
@@ -92,5 +128,145 @@ for word in f:
             toint=int(operand,16)
             memory[toint] = val[:2]
             memory[toint + 1] = val[-2:]
-              
-              
+
+
+    elif(opcode=='8'): #XOR
+        val=register['0001']
+        if(addr=='00'): #XOR 0004
+            opr=operand
+        elif(addr=='01'): #X0R C
+            opr=register[operand]
+        elif(addr=='10'): #XOR [C]
+            a=register[operand]
+            opr=getdatafrommemo(a)
+        elif(addr=='11'):  #XOR [1234]
+            opr=getdatafrommemo(operand)
+        tobin="{0:06b}".format(int(val, 16)).zfill(16) #binarye çevirdim 16 digitlik
+        oprtobin="{0:06b}".format(int(opr, 16)).zfill(16) #binarye çevirdim 16 digitlik
+        res=xor(tobin,oprtobin)
+        if(res=="0000000000000000"):
+            ZF=True
+        else:
+            ZF=False
+        if(res[0]==1):
+            SF=True
+        else:
+            SF=False
+        register["0001"]=hex(int(res,2))[2:].zfill(4)
+
+    elif (opcode=='9'): #AND
+        val = register['0001']
+        if (addr == '00'):  # XOR 0004
+            opr = operand
+        elif (addr == '01'):  # X0R C
+            opr = register[operand]
+        elif (addr == '10'):  # XOR [C]
+            a = register[operand]
+            opr = getdatafrommemo(a)
+        elif (addr == '11'):  # XOR [1234]
+            opr = getdatafrommemo(operand)
+        tobin = "{0:06b}".format(int(val, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        res = anding(tobin, oprtobin)
+        if (res == "0000000000000000"):
+            ZF = True
+        else:
+            ZF = False
+        if (res[0] == 1):
+            SF = True
+        else:
+            SF = False
+        register["0001"] = hex(int(res, 2))[2:].zfill(4)
+
+
+    elif (opcode == 'a'):  # OR
+        val = register['0001']
+        if (addr == '00'):  # XOR 0004
+            opr = operand
+        elif (addr == '01'):  # X0R C
+            opr = register[operand]
+        elif (addr == '10'):  # XOR [C]
+            a = register[operand]
+            opr = getdatafrommemo(a)
+        elif (addr == '11'):  # XOR [1234]
+            opr = getdatafrommemo(operand)
+        tobin = "{0:06b}".format(int(val, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        res = oring(tobin, oprtobin)
+        if (res == "0000000000000000"):
+            ZF = True
+        else:
+            ZF = False
+        if (res[0] == 1):
+            SF = True
+        else:
+            SF = False
+        register["0001"] = hex(int(res, 2))[2:].zfill(4)
+
+    elif (opcode == 'b'):  # NOT
+        if (addr == '00'):  # XOR 0004
+            opr = operand
+        elif (addr == '01'):  # X0R C
+            opr = register[operand]
+        elif (addr == '10'):  # XOR [C]
+            a = register[operand]
+            opr = getdatafrommemo(a)
+        elif (addr == '11'):  # XOR [1234]
+            opr = getdatafrommemo(operand)
+        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        res = noting(oprtobin)
+        if (res == "0000000000000000"):
+            ZF = True
+        else:
+            ZF = False
+        if (res[0] == 1):
+            SF = True
+        else:
+            SF = False
+        register["0001"] = hex(int(res, 2))[2:].zfill(4)
+
+    elif(opcode== 'c'): #SHL A
+        val=register[operand]
+        tobin = int(val,16) #decimala çevirdim
+        shiftleft=tobin<<1
+        tobin=bin(shiftleft)[2:]  #flagleri ayarlamak için bin e çevirdim
+        if len(tobin)==17:
+            if(tobin[0]==1):
+                CF=True
+            else:
+                CF=False
+        removefirst=tobin[1:]  #ilk digit carry flagte olduğu için artık 1. digitten başlayacak 16 digitlik olması için
+        if(removefirst=="0000000000000000"):
+            ZF=True
+        else:
+            ZF=False
+        if(removefirst[0]=="1"):
+            SF=True
+        else:
+            SF=False
+        register[operand] = hex(int(removefirst, 2))[2:].zfill(4)
+
+    elif (opcode == 'd'):  # SHR A
+        val = register[operand]
+        tobin = int(val, 16)  # decimala çevirdim
+        shiftleft = tobin >> 1
+        tobin = bin(shiftleft)[2:]  # flagleri ayarlamak için bin e çevirdim
+        SF = False  #ilk basamak hep 0
+        if (tobin == "0000000000000000"):
+            ZF = True
+        else:
+            ZF = False
+
+        register[operand] = hex(int(tobin, 2))[2:].zfill(4)
+
+    elif(opcode=="e"): #NOP
+        print("no operation")
+
+
+
+    #print(register.items())
+
+
+
+
+
