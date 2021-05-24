@@ -35,6 +35,11 @@ def getdatafrommemo(address):
     data = val1 + val2
     return data
 
+def putdatatomemo(address, data):
+    toint = int(address, 10)
+    memory[toint] = data[2:]
+    memory[toint + 1] = data[-2:]
+   
 def sum(operand1, operand2):
     global CF, SF, ZF
     int1 = int(operand1, 16)
@@ -177,12 +182,12 @@ for word in f:
 
         if addr=='10': #ADD [B]
             ad=register[operand]
-            data = memory[ad] + memory[ad+1]
+            data = getdatafrommemo(ad)
             val=sum(register['0001'],data)
 
         if addr=='11': #ADD [2542]
             ad = operand
-            data = memory[ad] + memory[ad+1]
+            data = getdatafrommemo(ad)
             val = sum(register['0001'], data)
         register['0001'] = val
 
@@ -197,12 +202,12 @@ for word in f:
 
         if addr=='10': #SUB [B]
             ad=register[operand]
-            data = memory[ad] + memory[ad+1]
+            data = getdatafrommemo(ad)
             val=sum(register['0001'],postoneg(data))
 
         if addr=='11': #SUB [2542]
             ad = operand
-            data = memory[ad] + memory[ad+1]
+            data = getdatafrommemo(ad)
             val = sum(register['0001'], postoneg(data))
         register['0001'] = val
 
@@ -218,17 +223,15 @@ for word in f:
 
         if addr=='10': #INC [B]
             ad=register[operand]
-            data = memory[ad] + memory[ad+1]
+            data = getdatafrommemo(ad)
             val=sum(data, '0001')
-            memory[ad] = val[:2]
-            memory[ad+ 1] = val[-2:]
+            putdatatomemo(ad, val)
 
         if addr=='11': #INC [2542]
             ad = operand
-            data = memory[ad] + memory[ad+1]
+            data = getdatafrommemo(ad)
             val = sum(data, '0001')
-            memory[ad] = val[:2]
-            memory[ad + 1] = val[-2:]
+            putdatatomemo(ad,val)
 
     elif opcode == '7': #Dec
        
@@ -244,15 +247,13 @@ for word in f:
             ad = register[operand]
             data = memory[ad] + memory[ad + 1]
             val = sum(data, 'ffff')
-            memory[ad] = val[:2]
-            memory[ad + 1] = val[-2:]
+            putdatatomemo(ad,val)
 
         if addr == '11':  #DEC [2542]
             ad = operand
             data = memory[ad] + memory[ad + 1]
             val = sum(data, 'ffff')
-            memory[ad] = val[:2]
-            memory[ad + 1] = val[-2:]
+            putdatatomemo(ad,val)
 
     elif(opcode=='8'): #XOR
         val=register['0001']
