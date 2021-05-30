@@ -10,6 +10,8 @@ labels = {}
 
 linecount = 0
 for line in f:  # labelları mape ekledim
+    if line =="\n":
+        continue
     islabel = re.search(':', line)
     if islabel:
         pos = line.find(':')
@@ -18,10 +20,13 @@ for line in f:  # labelları mape ekledim
     else:
         linecount=linecount+1
 
+
 f.close()
 f = open('file', 'r')
 
 for lines in f:
+    
+    lines=lines.strip()
     opcode = "-1"
     addrmode = "-1"
     operand = "-1"
@@ -70,7 +75,7 @@ for lines in f:
         addrmode = "0"
         operand = token
 
-    if opcode == "1":
+    if opcode == "1" or opcode=="E":
         addrmode = "0"
         operand = "0"
 
