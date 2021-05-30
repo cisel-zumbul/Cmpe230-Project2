@@ -1,8 +1,8 @@
 f = open('file2', 'r')
 
-register = {'0000': ' ', '0001': ' ', '0002': ' ', '0003': ' ', '0004': ' ', '0005': ' ', '0006': 65535}
+register = {'0000': ' ', '0001': ' ', '0002': ' ', '0003': ' ', '0004': ' ', '0005': ' ', '0006': 65534}
 asci = {'0041': 45, '0042': 47, '0043': 49, '0044': 51, '0045': 53}
-memory = [None] * 65536
+memory = ["0"] * 65536
 
 
 i=0
@@ -15,13 +15,12 @@ for instr in f:
 f.close()
 
 
-
 SF = False
 ZF = False
 CF = False
 
 def getdatafrommemo(address):
-    toint = int(address, 10)
+    toint = int(address, 16)
     val1 = memory[toint]
     val2 = memory[toint + 1]
     data = val1 + val2
@@ -30,8 +29,8 @@ def getdatafrommemo(address):
 
 
 def putdatatomemo(address, data):
-    toint = int(address, 10)
-    memory[toint] = data[2:]
+    toint = int(address, 16)
+    memory[toint] = data[:2]
     memory[toint + 1] = data[-2:]
 
 
@@ -84,8 +83,7 @@ def postoneg(operand):
         if c == '1':
             new = new + '0'
     a = int(new, 2)
-    a = a + 1
-    final = '{:x}'.format(a)
+    final=sum(hex(a), "0001")
     return final
 
 
@@ -131,6 +129,9 @@ def noting(bin):
 
 i=0
 
+
+
+
 while(i < lenofinst):
     register["0000"] = i*3
     word=memory[i]
@@ -147,7 +148,7 @@ while(i < lenofinst):
     #print(opcode,addr,operand)
 
     if (opcode == '1'):  # Halt
-        print("Halts the cpu")
+        break
     elif (opcode == '2'):  # Load
 
         if (addr == '00'):  # LOAD 'A', LOAD 0004
@@ -372,16 +373,16 @@ while(i < lenofinst):
                 CF = True
             else:
                 CF = False
-        removefirst = tobin[1:]  # ilk digit carry flagte olduğu için artık 1. digitten başlayacak 16 digitlik olması için
-        if (removefirst == "0000000000000000"):
-            ZF = True
-        else:
-            ZF = False
-        if (removefirst[0] == "1"):
+            tobin = tobin[1:]  # ilk digit carry flagte olduğu için artık 1. digitten başlayacak 16 digitlik olması için
+            if (tobin == "0000000000000000"):
+                ZF = True
+            else:
+                ZF = False
+        if (tobin[0] == "1"):
             SF = True
         else:
             SF = False
-        register[operand] = hex(int(removefirst, 2))[2:].zfill(4)
+        register[operand] = hex(int(tobin, 2))[2:].zfill(4)
 
     elif (opcode == 'd'):  # SHR A
         val = register[operand]
@@ -401,16 +402,14 @@ while(i < lenofinst):
 
     elif(opcode=="f"):  #push
         val=register[operand]
-        a=hex(register['0006'])
-        data=val[-2:] + val[:2]
-        putdatatomemo(a,data)
+        a=hex(register['0006'])[2:]
+        putdatatomemo(a,val)
         register['0006']=register['0006']-2
     elif(opcode=="10"):  #pop
-        valtail = memory[register["0006"]+1]
-        valhead = memory[register["0006"]+2]
-        val = valhead + valtail
-        register[operand]=val
         register['0006'] = register['0006'] + 2
+        val=getdatafrommemo(hex(register['0006']))
+        register[operand]=val
+
 
 
     elif(opcode=="11"): #CMP A-opr
@@ -442,6 +441,7 @@ while(i < lenofinst):
             continue
 
     elif(opcode=="14"):  #JNZ JNE -> jump the address if ZF is false
+        #print(ZF)
         if ZF is False:
             jumpto=int(operand,16)//3
             i=jumpto
@@ -461,25 +461,25 @@ while(i < lenofinst):
             register["0000"] = int(operand, 16)
             continue
     elif(opcode=="17"): #JA jump if above
-        if CF is True and SF is True:
+        if SF is False:
             jumpto = int(operand, 16) // 3
             i = jumpto
             register["0000"] = int(operand, 16)
             continue
     elif(opcode=="18"): #JAE jump if above or equal
-        if (CF is True and SF is True) or ZF is True:
+        if SF is False or ZF is True:
             jumpto = int(operand, 16) // 3
             i = jumpto
             register["0000"] = int(operand, 16)
             continue
     elif (opcode == "19"):  # JB if below
-        if CF is False and SF is False:
+        if SF is True:
             jumpto = int(operand, 16) // 3
             i = jumpto
             register["0000"] = int(operand, 16)
             continue
     elif (opcode == "1a"):  # JBE if below or equal
-        if (CF is False and SF is False) or ZF is True:
+        if SF is True or ZF is True:
             jumpto = int(operand, 16) // 3
             i = jumpto
             register["0000"] = int(operand, 16)
@@ -511,4 +511,14 @@ while(i < lenofinst):
         print(chr(todec))
 
     i=i+1
+    #print(ZF,"B:",register['0002'],"A:",register['0001'])
     #print(register.items())
+    #print(memory[int("0104",16) + 1])
+    #for l in range(1,10):
+     #   print(memory[-l])
+    #print(postoneg("0003"))
+
+
+
+
+
