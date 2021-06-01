@@ -27,9 +27,14 @@ for line in f:  # labelları mape ekledim
 f.close()
 f = open(sys.argv[1], 'r')
 
+error = False
+
 #print(linecount)
 for lines in f:
-    if line =="\n":
+    labelmisin=False
+    
+    bosmu=re.search("\w",lines)
+    if not bosmu:
         continue
     
     lines=lines.strip()
@@ -40,6 +45,7 @@ for lines in f:
     for token in word:
         labelmi = re.search('\:', token)
         if labelmi:  # loop: gibi bi satırsa geçiyoz
+            labelmisin=True
             continue
         delete = re.search('\n', token)
         if delete:  # mal olduğu için sonuna newline eklemiş onları sildim
@@ -58,6 +64,10 @@ for lines in f:
             continue
         tirnak = re.search('\'', token)
         if tirnak:  # tırnak içindeyse
+            if len(token)!=3:
+                error=True
+                print("INVALID INPUT")
+                break
             addrmode = "0"
             token = token[1:2]
             asci = format(ord(token), "x")
@@ -78,17 +88,41 @@ for lines in f:
                 operand = memo
                 continue
         # hiçbiri değilse normal sayıdır  load 0004
-        addrmode = "0"
-        operand = token
+        immediate = re.search("\A0[A-F0-9a-f]{4}",token)
+        valid = re.search("\A[^A-Za-z][A-F0-9a-f]{0,3}",token)
 
-    if opcode == "1" or opcode=="E":
+
+        
+        if immediate or valid :
+            operand = token
+            if immediate:
+                operand=token[1:]
+            addrmode = "0"
+            continue
+
+        print("SYNTAX ERROR")
+        print(token)
+        error=True
+        break
+        
+    if error is True:
+        break
+
+    if labelmisin is True:
+        continue
+
+    if opcode == "1" or opcode=="E": #halt ve nop
         addrmode = "0"
         operand = "0"
 
    # print(opcode, addrmode, operand)
 
-    if opcode == "-1":
-        continue
+    if opcode == "-1" or addrmode =="-1" or operand=="-1":
+        error == True
+        print("SYNTAX ERROR")
+        print(token)
+        break
+        
 
     opcode1 = int(opcode, 16)
     addrmode1 = int(addrmode, 16)

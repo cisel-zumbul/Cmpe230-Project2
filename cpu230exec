@@ -32,7 +32,13 @@ def getdatafrommemo(address):
 
 
 def putdatatomemo(address, data):
+    global error
+
     toint = int(address, 16)
+    if toint+1 > 65535:
+        print("INVALID MEMORY ADDRESS")
+        error=True
+        return
     memory[toint] = data[:2]
     memory[toint + 1] = data[-2:]
 
@@ -132,10 +138,10 @@ def noting(bin):
 
 i=0
 
+error= False
 
+while(i < lenofinst and error is False):  #48006c
 
-
-while(i < lenofinst):  #48006c
     register["0000"] = i
     #print(register["0000"])
     word1=memory[i]
@@ -413,6 +419,10 @@ while(i < lenofinst):  #48006c
 
 
     elif(opcode=="10"):  #pop
+        if register['0006'] ==65534:
+            print("STACK IS EMPTY")
+            error=True
+            break
         register['0006'] = register['0006'] + 2
         val=getdatafrommemo(hex(register['0006']))
         register[operand]=val
