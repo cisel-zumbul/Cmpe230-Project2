@@ -1,5 +1,8 @@
+
 import sys
 f = open(sys.argv[1], 'r')
+outputf=sys.argv[1][:-3]+"txt"
+output1=open(outputf,'w')
 
 register = {'0000': ' ', '0001': ' ', '0002': ' ', '0003': ' ', '0004': ' ', '0005': ' ', '0006': 65534}
 asci = {'0041': 45, '0042': 47, '0043': 49, '0044': 51, '0045': 53}
@@ -515,6 +518,7 @@ while(i < lenofinst and error is False):  #48006c
             opr = getdatafrommemo(operand)
         todec=int(opr,16)
         print(chr(todec))
+        output1.write(chr(todec)+"\n")
 
     i=i+3
     #print(ZF,"B:",register['0002'],"A:",register['0001'])
@@ -523,8 +527,5 @@ while(i < lenofinst and error is False):  #48006c
     #for l in range(1,10):
      #   print(memory[-l])
     #print(postoneg("0003"))
-
-
-
 
 
