@@ -12,7 +12,7 @@ registers = {'PC': "0", 'A': "1", 'B': "2", 'C': "3", 'D': "4", 'E': "5", 'S': "
 labels = {}
 
 linecount = 0
-for line in f:  # labelları mape ekledim
+for line in f:  #finds the labels and put them into labels dictionary
     bosmu=re.search("\w",line)
     if not bosmu:
         continue
@@ -34,8 +34,8 @@ error = False
 for lines in f:
     labelmisin=False
     
-    bosmu=re.search("\w",lines)
-    if not bosmu:
+    bosmu=re.search("\w",lines)  
+    if not bosmu:   #if it is an empty line, it continues
         continue
     
     lines=lines.strip()
@@ -45,26 +45,26 @@ for lines in f:
     word = lines.split(" ")
     for token in word:
         labelmi = re.search('\:', token)
-        if labelmi:  # loop: gibi bi satırsa geçiyoz
+        if labelmi:  #if it is the label line such as LABEL: it continues
             labelmisin=True
             continue
         delete = re.search('\n', token)
-        if delete:  # mal olduğu için sonuna newline eklemiş onları sildim
+        if delete:  #deletes the \n character at the end of the string
             pos = token.find('\n')
             token = token[:pos]
-        if token in map:  # mapteyse load store vs demektir
+        if token in map:  
             opcode = map[token]
             continue
-        if token in labels:  # labelsa
+        if token in labels:  
             addrmode = "0"
             operand = labels[token]
             continue
-        if token in registers:  # registerlardan biriyse
+        if token in registers:  
             addrmode = "1"
             operand = registers[token]
             continue
         tirnak = re.search('\'', token)
-        if tirnak:  # tırnak içindeyse
+        if tirnak:  
             if len(token)!=3:
                 error=True
                 print("INVALID INPUT")
@@ -75,24 +75,22 @@ for lines in f:
             operand = asci
             continue
         bracket = re.search('\[', token)
-        if bracket:  # parantez içindeyse
-            if len(token) is 3:  # [B] gibi
+        if bracket:  
+            if len(token) is 3:  # [B] 
                 token = token[1:2]
                 val = registers[token]
                 addrmode = "2"
                 operand = val
                 continue
-            else:  # [1234] gibi
+            else:  # [1234] 
                 closeb = token.find('\]')
                 memo = token[1:closeb]
                 addrmode = "3"
                 operand = memo
                 continue
-        # hiçbiri değilse normal sayıdır  load 0004
+       
         immediate = re.search("\A0[A-F0-9a-f]{4}",token)
         valid = re.search("\A[^A-Za-z][A-F0-9a-f]{0,3}",token)
-
-
         
         if immediate or valid :
             operand = token
@@ -112,7 +110,7 @@ for lines in f:
     if labelmisin is True:
         continue
 
-    if opcode == "1" or opcode=="E": #halt ve nop
+    if opcode == "1" or opcode=="E": #halt and nop
         addrmode = "0"
         operand = "0"
 

@@ -11,7 +11,7 @@ memory = ["0"] * 65536
 
 i=0
 lenofinst=0
-for instr in f: #48006c
+for instr in f:        #divides instructions into 3 parts and put them in 3 consecutive indexes
     memory[i]=instr[:2]
     memory[i+1]=instr[2:4]
     memory[i+2]=instr[4:6]
@@ -91,7 +91,7 @@ def sum(operand1, operand2, operand3): #Performs addition and subtraction operat
     return final
 
 
-def xor(bin1, bin2):
+def xor(bin1, bin2):  #xor operation of two binary number
     res = ""
     for i in range(16):
         if bin1[i] == bin2[i]:
@@ -101,7 +101,7 @@ def xor(bin1, bin2):
     return res
 
 
-def anding(bin1, bin2):
+def anding(bin1, bin2):  #and operation of two binary number
     res = ""
     for i in range(16):
         if bin1[i] == "1" and bin2[i] == "1":
@@ -111,7 +111,7 @@ def anding(bin1, bin2):
     return res
 
 
-def oring(bin1, bin2):
+def oring(bin1, bin2):  #or operation of two binary number
     res = ""
     for i in range(16):
         if bin1[i] == "0" and bin2[i] == "0":
@@ -121,7 +121,7 @@ def oring(bin1, bin2):
     return res
 
 
-def noting(bin):
+def noting(bin):    #not operation of a binary number
     res = ""
     for i in range(16):
         if bin[i] == "0":
@@ -133,22 +133,22 @@ def noting(bin):
 
 i=0
 
-error= False
+error= False  #to handle errors
 
 
-while(i < lenofinst and error is False):  #48006c
+while(i < lenofinst and error is False):  
 
     register["0000"] = i
-    word1=memory[i]
-    word2=memory[i+1]
+    word1=memory[i]     #takes the 3 consecutive values from the memory to decide opcode,addressing mode and operand
+    word2=memory[i+1]       
     word3=memory[i+2]
-    operand=word2+word3
-    tobinary = "{0:06b}".format(int(word1, 16))  # binarye cevirdim
-    o = tobinary[:-2]  # bastan son iki digite kadar
+    operand=word2+word3  #operand
+    tobinary = "{0:06b}".format(int(word1, 16))  
+    o = tobinary[:-2]  
     o2 = int(o, 2)
     o3 = hex(o2)
-    opcode = o3[2:]
-    addr = tobinary[-2:]  # son iki digit
+    opcode = o3[2:]     #operation code
+    addr = tobinary[-2:]  # addressing mode
 
     if (opcode == '1'):  # Halts the cpu
         break
@@ -172,17 +172,17 @@ while(i < lenofinst and error is False):  #48006c
     elif (opcode == '3'):  # Stores the content of register A 
 
         if (addr == '01'):  # STORE C       
-            val = register['0001']                  
-            register[operand] = val
+            val = register['0001']    #gets data from the register A              
+            register[operand] = val   #then puts data in given register
             
         if (addr == '10'):  # STORE [C]
-            val = register['0001']
-            a = register[operand]
-            putdatatomemo(a,val)
+            val = register['0001']      #gets data from the register A   
+            a = register[operand]       #gets the address in given register
+            putdatatomemo(a,val)        #puts data into the  memory
             
         if (addr == '11'):  # STORE [1234]
-            val = register['0001']
-            putdatatomemo(operand, val)
+            val = register['0001']  #gets the address in given register
+            putdatatomemo(operand, val)     #puts data into the memory
 
     elif opcode == '4':  # Add
 
@@ -190,19 +190,19 @@ while(i < lenofinst and error is False):  #48006c
             val = sum(register['0001'], operand, "")
 
         if addr == '01':  # ADD C
-            op2 = register[operand]
+            op2 = register[operand] #gets data from the given register
             val = sum(register['0001'], op2, "")
 
         if addr == '10':  # ADD [B]
-            ad = register[operand]
-            data = getdatafrommemo(ad)
+            ad = register[operand]  
+            data = getdatafrommemo(ad)     #gets the data from the memory
             val = sum(register['0001'], data, "")
 
         if addr == '11':  # ADD [2542]
             ad = operand
-            data = getdatafrommemo(ad)
+            data = getdatafrommemo(ad)  #gets the data from the memory
             val = sum(register['0001'], data, "")
-        register['0001'] = val
+        register['0001'] = val  #puts calculated value to the register A
 
     elif opcode == '5':  # Sub
 
@@ -280,18 +280,18 @@ while(i < lenofinst and error is False):  #48006c
             opr = getdatafrommemo(a)
         elif (addr == '11'):  # XOR [1234]
             opr = getdatafrommemo(operand)
-        tobin = "{0:06b}".format(int(val, 16)).zfill(16)  # binarye çevirdim 16 digitlik
-        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
-        res = xor(tobin, oprtobin)
-        if (res == "0000000000000000"):
+        tobin = "{0:06b}".format(int(val, 16)).zfill(16)  #converts the data in the register A to 16 bit binary number
+        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  #converts the operand to 16 bit binary number
+        res = xor(tobin, oprtobin)  #xor operation
+        if (res == "0000000000000000"):  #if the result is sum it sets the zero flag
             ZF = True
         else:
             ZF = False
-        if (res[0] == 1):
+        if (res[0] == 1):   #if the first bit is 1 it sets the sign flag
             SF = True
         else:
             SF = False
-        register["0001"] = hex(int(res, 2))[2:].zfill(4)
+        register["0001"] = hex(int(res, 2))[2:].zfill(4) #converts the result to hex and put it into register A
 
     elif (opcode == '9'):  # AND
         val = register['0001']
@@ -304,8 +304,8 @@ while(i < lenofinst and error is False):  #48006c
             opr = getdatafrommemo(a)
         elif (addr == '11'):  # AND [1234]
             opr = getdatafrommemo(operand)
-        tobin = "{0:06b}".format(int(val, 16)).zfill(16)  # binarye çevirdim 16 digitlik
-        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        tobin = "{0:06b}".format(int(val, 16)).zfill(16) 
+        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  
         res = anding(tobin, oprtobin)
         if (res == "0000000000000000"):
             ZF = True
@@ -329,8 +329,8 @@ while(i < lenofinst and error is False):  #48006c
             opr = getdatafrommemo(a)
         elif (addr == '11'):  # OR [1234]
             opr = getdatafrommemo(operand)
-        tobin = "{0:06b}".format(int(val, 16)).zfill(16)  # binarye çevirdim 16 digitlik
-        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        tobin = "{0:06b}".format(int(val, 16)).zfill(16) 
+        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  
         res = oring(tobin, oprtobin)
         if (res == "0000000000000000"):
             ZF = True
@@ -352,7 +352,7 @@ while(i < lenofinst and error is False):  #48006c
             opr = getdatafrommemo(a)
         elif (addr == '11'):  # NOT [1234]
             opr = getdatafrommemo(operand)
-        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  # binarye çevirdim 16 digitlik
+        oprtobin = "{0:06b}".format(int(opr, 16)).zfill(16)  
         res = noting(oprtobin)
         if (res == "0000000000000000"):
             ZF = True
@@ -366,31 +366,34 @@ while(i < lenofinst and error is False):  #48006c
 
     elif (opcode == 'c'):  # SHL A
         val = register[operand]
-        tobin = int(val, 16)  # decimala çevirdim
-        shiftleft = tobin << 1
-        tobin = bin(shiftleft)[2:]  # flagleri ayarlamak için bin e çevirdim
-        if len(tobin) == 17:
-            if (tobin[0] == 1):
+        tobin = int(val, 16)  
+        shiftleft = tobin << 1  #shift left operation
+        tobin = bin(shiftleft)[2:]  #converts to binary in order to set the flags
+        
+        if len(tobin) == 17:  
+            if (tobin[0] == 1):  #if the length is 17 and first bit is 1 it sets the carry flag
                 CF = True
             else:
                 CF = False
-            tobin = tobin[1:]  # ilk digit carry flagte olduğu için artık 1. digitten başlayacak 16 digitlik olması için
-            if (tobin == "0000000000000000"):
-                ZF = True
-            else:
-                ZF = False
-        if (tobin[0] == "1"):
+            tobin = tobin[1:]  #since the first bit is in the carry flag now we should get rid of it
+        if (tobin == "0000000000000000" or shiftleft==0):  #if the result is 0 it sets the zero flag
+            ZF = True
+        else:
+            ZF = False
+        if (tobin[0] == "1"):  #if the first bit is 1 it sets the sign flag
             SF = True
         else:
             SF = False
         register[operand] = hex(int(tobin, 2))[2:].zfill(4)
+        
+        
 
     elif (opcode == 'd'):  # SHR A
         val = register[operand]
-        tobin = int(val, 16)  # decimala çevirdim
-        shiftleft = tobin >> 1
-        tobin = bin(shiftleft)[2:]  # flagleri ayarlamak için bin e çevirdim
-        SF = False  # ilk basamak hep 0
+        tobin = int(val, 16)  
+        shiftleft = tobin >> 1  #shift right operation
+        tobin = bin(shiftleft)[2:]  
+        SF = False  # since the first bit is always zero sign flag must be false
         if (tobin == "0000000000000000"):
             ZF = True
         else:
