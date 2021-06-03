@@ -13,6 +13,7 @@ labels = {}
 
 linecount = 0
 for line in f:  #finds the labels and put them into labels dictionary
+    line=line.upper()
     bosmu=re.search("\w",line)
     if not bosmu:
         continue
@@ -32,6 +33,7 @@ error = False
 
 #print(linecount)
 for lines in f:
+    lines=lines.upper()
     labelmisin=False
     
     bosmu=re.search("\w",lines)  
@@ -100,7 +102,7 @@ for lines in f:
             continue
 
         print("SYNTAX ERROR")
-        print(token)
+        #print(token)
         error=True
         break
         
@@ -119,7 +121,7 @@ for lines in f:
     if opcode == "-1" or addrmode =="-1" or operand=="-1":
         error == True
         print("SYNTAX ERROR")
-        print(token)
+        #print(token)
         break
         
 

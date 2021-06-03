@@ -520,7 +520,7 @@ while(i < lenofinst and error is False):
         elif (addr == '11'):  # Print [1234]
             opr = getdatafrommemo(operand)
         todec=int(opr,16)
-        print(chr(todec))
+        #print(chr(todec))
         output1.write(chr(todec)+"\n")
 
     i=i+3
