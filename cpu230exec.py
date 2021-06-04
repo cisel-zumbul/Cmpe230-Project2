@@ -407,7 +407,6 @@ while(i < lenofinst and error is False):
 
     elif(opcode=="f"):  #push
         val=register[operand]
-        #print(val)
         a=hex(register['0006'])[2:]
         putdatatomemo(a,val)
         register['0006']=register['0006']-2
@@ -453,13 +452,13 @@ while(i < lenofinst and error is False):
             continue
 
     elif(opcode=="14"):  #JNZ JNE -> jump the address if ZF is false
-        #print(ZF)
+       
         if ZF is False:
             jumpto=int(operand,16)
             i=jumpto
             register["0000"] = int(operand, 16)
             continue
-            #print(i)
+            
     elif(opcode=="15"): #JC
         if CF is True:
             jumpto = int(operand, 16) 
@@ -520,15 +519,9 @@ while(i < lenofinst and error is False):
         elif (addr == '11'):  # Print [1234]
             opr = getdatafrommemo(operand)
         todec=int(opr,16)
-        #print(chr(todec))
         output1.write(chr(todec)+"\n")
 
     i=i+3
-    #print(ZF,"B:",register['0002'],"A:",register['0001'])
-    #print(register.items())
-    #print(memory[int("0104",16) + 1])
-    #for l in range(1,10):
-     #   print(memory[-l])
-    #print(postoneg("0003"))
+    
 
 

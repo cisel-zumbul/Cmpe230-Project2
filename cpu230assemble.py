@@ -17,11 +17,12 @@ for line in f:  #finds the labels and put them into labels dictionary
     bosmu=re.search("\w",line)
     if not bosmu:
         continue
-    islabel = re.search(':', line)
+    islabel = re.search(':', line)      
     if islabel:
         pos = line.find(':')
-        val = 3 * (linecount)
-        labels[line[:pos]] = hex(val)[2:]
+        val = 3 * (linecount)    #label      :
+        line=line[:pos].strip()
+        labels[line] = hex(val)[2:]
     else:
         linecount=linecount+1
 
@@ -31,40 +32,33 @@ f = open(sys.argv[1], 'r')
 
 error = False
 
-#print(linecount)
+
 for lines in f:
-    lines=lines.upper()
     labelmisin=False
+
     
     bosmu=re.search("\w",lines)  
     if not bosmu:   #if it is an empty line, it continues
+        continue
+
+    labelmi = re.search('\:', lines)
+    if labelmi:  #if it is the label line such as LABEL: it continues
+        labelmisin=True
         continue
     
     lines=lines.strip()
     opcode = "-1"
     addrmode = "-1"
     operand = "-1"
-    word = lines.split(" ")
+    word=re.split(r"\s+",lines)
     for token in word:
-        labelmi = re.search('\:', token)
-        if labelmi:  #if it is the label line such as LABEL: it continues
-            labelmisin=True
-            continue
+        
+        
         delete = re.search('\n', token)
         if delete:  #deletes the \n character at the end of the string
             pos = token.find('\n')
             token = token[:pos]
-        if token in map:  
-            opcode = map[token]
-            continue
-        if token in labels:  
-            addrmode = "0"
-            operand = labels[token]
-            continue
-        if token in registers:  
-            addrmode = "1"
-            operand = registers[token]
-            continue
+
         tirnak = re.search('\'', token)
         if tirnak:  
             if len(token)!=3:
@@ -76,6 +70,21 @@ for lines in f:
             asci = format(ord(token), "x")
             operand = asci
             continue
+        token=token.upper()
+        if token in map:  
+            opcode = map[token]
+            continue
+
+        if token in labels:  
+            addrmode = "0"
+            operand = labels[token]
+            continue
+
+        if token in registers:  
+            addrmode = "1"  
+            operand = registers[token]
+            continue
+
         bracket = re.search('\[', token)
         if bracket:  
             if len(token) is 3:  # [B] 
@@ -102,7 +111,6 @@ for lines in f:
             continue
 
         print("SYNTAX ERROR")
-        #print(token)
         error=True
         break
         
@@ -116,12 +124,11 @@ for lines in f:
         addrmode = "0"
         operand = "0"
 
-   # print(opcode, addrmode, operand)
+   
 
     if opcode == "-1" or addrmode =="-1" or operand=="-1":
         error == True
         print("SYNTAX ERROR")
-        #print(token)
         break
         
 
